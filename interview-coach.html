@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Interview Coach — Synaps Career</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:#7C3AED;--pl:#A78BFA;--pll:#C4B5FD;--black:#050505;--white:#F9F7F4;--gray:#8A8A8A;--border:rgba(255,255,255,.07)}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
+.cursor{position:fixed;width:10px;height:10px;background:var(--pl);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference}
+.cursor-ring{position:fixed;width:40px;height:40px;border:1px solid rgba(167,139,250,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:.12s}
+.grain{position:fixed;inset:0;opacity:.04;pointer-events:none;z-index:100;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:1.5rem 3rem;display:flex;align-items:center;justify-content:space-between;transition:border-color .4s,background .4s;border-bottom:1px solid transparent}
+nav.scrolled{border-color:var(--border);background:rgba(5,5,5,.85);backdrop-filter:blur(20px)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;text-decoration:none;color:var(--white)}
+.nav-logo span{color:var(--pl);font-style:italic}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{color:rgba(255,255,255,.5);text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;transition:color .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+.nav-cta{background:var(--p) !important;color:var(--white) !important;padding:.6rem 1.5rem}
+
+/* HERO — immersive, full dark */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:7rem 3rem 4rem;position:relative;overflow:hidden}
+.hero-bg-grid{position:absolute;inset:0;opacity:.04;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:80px 80px}
+.hero-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,.2) 0%,transparent 65%);pointer-events:none;animation:orbPulse 5s ease-in-out infinite}
+@keyframes orbPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}}
+
+.product-badge{display:inline-flex;align-items:center;gap:.6rem;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:var(--pll);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;padding:.4rem 1rem;margin-bottom:2.5rem;opacity:0;animation:fadeUp .7s ease .3s forwards;position:relative;z-index:1}
+.badge-rec{width:8px;height:8px;background:var(--p);position:relative}
+.badge-rec::after{content:'';position:absolute;inset:-3px;border:1px solid rgba(124,58,237,.5);animation:recPulse 1.5s ease-in-out infinite}
+@keyframes recPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:0}}
+
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,8vw,7.5rem);line-height:.92;font-weight:300;letter-spacing:-.04em;margin-bottom:1.75rem;opacity:0;animation:fadeUp .7s ease .5s forwards;position:relative;z-index:1}
+.hero-title em{font-style:italic;color:var(--pl)}
+.hero-sub{font-size:.95rem;color:var(--gray);line-height:1.75;max-width:520px;margin:0 auto 2.5rem;font-weight:300;opacity:0;animation:fadeUp .7s ease .7s forwards;position:relative;z-index:1}
+.hero-actions{display:flex;gap:1rem;align-items:center;justify-content:center;opacity:0;animation:fadeUp .7s ease .9s forwards;position:relative;z-index:1}
+.btn-primary{background:var(--p);color:var(--white);padding:.9rem 2.25rem;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:background .3s;display:inline-block}
+.btn-primary:hover{background:#6D28D9}
+.btn-ghost{color:rgba(255,255,255,.5);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:color .3s}
+.btn-ghost:hover{color:var(--white)}
+
+/* MOCK INTERVIEW UI */
+.mock-ui{position:relative;z-index:1;margin-top:4rem;max-width:680px;width:100%;opacity:0;animation:fadeUp .8s ease 1.1s forwards}
+.mock-window{background:#0c0c0c;border:1px solid rgba(124,58,237,.2);overflow:hidden;position:relative}
+.mock-window::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--p),var(--pl),transparent)}
+.mock-topbar{background:#111;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.mock-dots{display:flex;gap:.4rem}
+.mock-dot{width:7px;height:7px;border-radius:50%}
+.mock-dot:nth-child(1){background:#ff5f57}
+.mock-dot:nth-child(2){background:#febc2e}
+.mock-dot:nth-child(3){background:#28c840}
+.mock-info{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.rec-indicator{display:flex;align-items:center;gap:.4rem;font-size:.65rem;color:rgba(239,68,68,.8)}
+.rec-dot{width:5px;height:5px;background:#EF4444;border-radius:50%;animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.mock-body{padding:1.5rem;display:grid;grid-template-columns:1fr 2fr;gap:1.5rem}
+.interviewer-panel{text-align:center}
+.iv-avatar{width:60px;height:60px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(124,58,237,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto .75rem}
+.iv-name{font-size:.72rem;font-weight:500}
+.iv-role{font-size:.62rem;color:var(--gray);margin-bottom:.75rem}
+.iv-wave{display:flex;align-items:center;justify-content:center;gap:2px;height:20px}
+.wave-bar{width:3px;background:var(--pl);border-radius:2px;animation:wave 1.2s ease-in-out infinite}
+.wave-bar:nth-child(1){height:4px;animation-delay:0s}
+.wave-bar:nth-child(2){height:12px;animation-delay:.1s}
+.wave-bar:nth-child(3){height:18px;animation-delay:.2s}
+.wave-bar:nth-child(4){height:10px;animation-delay:.3s}
+.wave-bar:nth-child(5){height:6px;animation-delay:.4s}
+.wave-bar:nth-child(6){height:14px;animation-delay:.5s}
+.wave-bar:nth-child(7){height:8px;animation-delay:.3s}
+@keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.4)}}
+.chat-panel{}
+.chat-bubble{padding:.75rem 1rem;margin-bottom:.75rem;font-size:.78rem;line-height:1.55}
+.chat-bubble.ai{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.15);color:rgba(255,255,255,.85)}
+.chat-bubble.user{background:#151515;border:1px solid var(--border);color:rgba(255,255,255,.65);margin-left:1rem}
+.chat-bubble.feedback{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);color:rgba(255,255,255,.75)}
+.feedback-header{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:#6EE7B7;margin-bottom:.35rem}
+.typing-row{display:flex;gap:.25rem;padding:.5rem 1rem}
+.typing-dot{width:4px;height:4px;background:var(--pl);border-radius:50%;animation:typingAnim 1.4s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingAnim{0%,80%,100%{transform:scale(1);opacity:.4}40%{transform:scale(1.3);opacity:1}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTIONS */
+section{padding:7rem 3rem}
+.section-label{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--pl);margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.section-label::before{content:'';width:30px;height:1px;background:var(--p)}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.25rem,4vw,4rem);font-weight:300;line-height:1.05;letter-spacing:-.03em}
+.section-title em{font-style:italic;color:var(--pl)}
+
+/* FEATURES */
+.features{background:#080808}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:4rem}
+.feature-card{background:#080808;padding:2.5rem;position:relative;overflow:hidden}
+.feature-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,.3),transparent);opacity:0;transition:opacity .4s}
+.feature-card:hover::after{opacity:1}
+.feature-icon{font-size:1.5rem;margin-bottom:1.25rem}
+.feature-title{font-size:.95rem;font-weight:500;margin-bottom:.6rem}
+.feature-desc{font-size:.8rem;color:var(--gray);line-height:1.7;font-weight:300}
+
+/* ROLES SECTION */
+.roles{background:var(--black)}
+.roles-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;margin-top:5rem}
+.roles-list{display:flex;flex-direction:column;gap:.5rem}
+.role-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:1px solid var(--border);cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.role-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--p);transform:scaleY(0);transition:transform .3s}
+.role-item:hover,.role-item.active{border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.04)}
+.role-item:hover::before,.role-item.active::before{transform:scaleY(1)}
+.role-name{font-size:.85rem;font-weight:400}
+.role-count{font-size:.68rem;color:var(--gray);letter-spacing:.05em}
+.role-arrow{color:var(--pl);opacity:0;transition:opacity .3s,transform .3s}
+.role-item:hover .role-arrow,.role-item.active .role-arrow{opacity:1;transform:translateX(4px)}
+
+.role-preview{background:#0c0c0c;border:1px solid var(--border);position:relative}
+.role-preview::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--pl))}
+.rp-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.rp-title{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.rp-role{font-size:1rem;font-weight:500;margin-top:.35rem}
+.rp-body{padding:1.25rem 1.5rem}
+.question-chip{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.15);padding:.6rem .9rem;font-size:.75rem;color:rgba(255,255,255,.7);margin-bottom:.5rem;line-height:1.45}
+.question-chip.loading{opacity:.4}
+
+/* FEEDBACK */
+.feedback-section{background:#080808}
+.fb-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;margin-top:5rem}
+.fb-visual{background:#0c0c0c;border:1px solid var(--border);overflow:hidden}
+.fb-visual::after{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--p),var(--pl),transparent)}
+.fb-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.fb-title{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.session-id{font-size:.65rem;color:var(--pl)}
+.fb-body{padding:1.5rem}
+.fb-metric{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid var(--border)}
+.fb-metric:last-child{border-bottom:none}
+.fb-metric-name{font-size:.78rem;color:rgba(255,255,255,.6)}
+.fb-metric-score{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300}
+.fb-metric-score.excellent{color:#6EE7B7}
+.fb-metric-score.good{color:var(--pl)}
+.fb-metric-score.needs-work{color:#FCD34D}
+.fb-comment{background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.12);padding:1rem;margin-top:1rem}
+.fb-comment-label{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--pl);margin-bottom:.5rem}
+.fb-comment-text{font-size:.78rem;color:rgba(255,255,255,.65);line-height:1.55}
+
+.fb-benefits{display:flex;flex-direction:column;gap:1.75rem}
+.fb-benefit{padding-left:1.5rem;border-left:2px solid rgba(124,58,237,.3);transition:border-color .3s}
+.fb-benefit:hover{border-color:var(--p)}
+.fb-benefit-title{font-size:.92rem;font-weight:500;margin-bottom:.4rem}
+.fb-benefit-desc{font-size:.8rem;color:var(--gray);line-height:1.65;font-weight:300}
+
+/* INDUSTRIES */
+.industries{background:var(--black)}
+.industry-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-top:4rem}
+.industry-card{background:var(--black);padding:2rem;text-align:center;transition:background .3s;cursor:pointer}
+.industry-card:hover{background:#0c0c0c}
+.industry-icon{font-size:2rem;margin-bottom:1rem}
+.industry-name{font-size:.85rem;font-weight:500;margin-bottom:.35rem}
+.industry-sub{font-size:.7rem;color:var(--gray)}
+.industry-q-count{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--pl);margin-top:.5rem}
+
+/* TESTIMONIALS */
+.testi{background:#080808}
+.testi-scroll{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:4rem}
+.testi-card{background:#080808;padding:2.25rem}
+.quote-mark{font-family:'Cormorant Garamond',serif;font-size:3rem;color:var(--p);line-height:.5;margin-bottom:1rem;opacity:.5}
+.testi-text{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;font-weight:300;line-height:1.5;margin-bottom:1.25rem;color:rgba(255,255,255,.85)}
+.testi-author{display:flex;align-items:center;gap:.65rem}
+.ta-avatar{width:30px;height:30px;background:linear-gradient(135deg,var(--p),var(--pl));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem}
+.ta-name{font-size:.75rem;font-weight:500}
+.ta-role{font-size:.68rem;color:var(--gray)}
+.testi-tag{display:inline-block;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.15);color:var(--pll);font-size:.6rem;padding:.2rem .5rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.75rem}
+
+/* PRICING TEASER */
+.pricing-teaser{background:var(--black);border-top:1px solid var(--border);text-align:center}
+.pt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);max-width:800px;margin:3rem auto 0}
+.pt-card{background:#0a0a0a;padding:2rem;text-align:center}
+.pt-card.featured{background:#0e0b1a;position:relative}
+.pt-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--p),var(--pl))}
+.pt-name{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gray);margin-bottom:.75rem}
+.pt-sessions{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--pl);margin-bottom:.25rem}
+.pt-desc{font-size:.72rem;color:var(--gray)}
+
+/* CTA */
+.cta-section{background:var(--black);text-align:center;padding:9rem 3rem;position:relative;overflow:hidden}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(124,58,237,.15) 0%,transparent 65%)}
+.cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.75rem,6vw,5.5rem);font-weight:300;letter-spacing:-.03em;line-height:1.05;margin-bottom:1.5rem;position:relative}
+.cta-title em{font-style:italic;color:var(--pl)}
+.cta-sub{color:var(--gray);font-size:.88rem;margin-bottom:.75rem;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.7}
+.cta-note{font-size:.7rem;color:rgba(255,255,255,.2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2.5rem}
+
+footer{background:#030303;border-top:1px solid var(--border);padding:3rem;display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:.72rem;color:rgba(255,255,255,.2)}
+.footer-links{display:flex;gap:1.5rem}
+.footer-links a{font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;transition:color .3s}
+.footer-links a:hover{color:var(--white)}
+
+.reveal{opacity:0;transform:translateY(35px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  nav{padding:1.25rem 1.5rem}
+  .nav-links{display:none}
+  .hero{padding:5rem 1.5rem 3rem}
+  section{padding:5rem 1.5rem}
+  .features-grid,.industry-grid{grid-template-columns:1fr 1fr}
+  .roles-grid,.fb-grid{grid-template-columns:1fr}
+  .testi-scroll{grid-template-columns:1fr}
+  .pt-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:1rem;text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div class="grain"></div>
+
+<nav id="navbar">
+  <a class="nav-logo" href="home.html">Synaps <span>Career</span></a>
+  <div class="nav-links">
+    <a href="cv-builder.html">CV Builder</a>
+    <a href="cv-doctor.html">CV Doctor</a>
+    <a href="interview-coach.html" class="active">Interview Coach</a>
+    <a href="home.html#pricing">Pricing</a>
+    <a href="#" class="nav-cta">Start Practicing Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-orb"></div>
+  <div class="product-badge"><span class="badge-rec"></span>Tool 03 — AI Interview Coach</div>
+  <h1 class="hero-title">
+    Practice until<br>
+    there's nothing<br>
+    left to <em>fear.</em>
+  </h1>
+  <p class="hero-sub">Role-specific AI interviews with real-time feedback on delivery, content, and presence. Walk into any room having already been there.</p>
+  <div class="hero-actions">
+    <a href="#" class="btn-primary">Start Free Session</a>
+    <a href="#roles" class="btn-ghost">Explore Roles</a>
+  </div>
+  <div class="mock-ui">
+    <div class="mock-window">
+      <div class="mock-topbar">
+        <div class="mock-dots"><div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div></div>
+        <span class="mock-info">Live Session — Senior PM · Stripe</span>
+        <span class="rec-indicator"><span class="rec-dot"></span>REC</span>
+      </div>
+      <div class="mock-body">
+        <div class="interviewer-panel">
+          <div class="iv-avatar">🤖</div>
+          <div class="iv-name">Alex (AI)</div>
+          <div class="iv-role">Senior Hiring Manager</div>
+          <div class="iv-wave">
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          </div>
+        </div>
+        <div class="chat-panel">
+          <div class="chat-bubble ai">Tell me about a time you had to make a product decision with incomplete data. How did you handle the ambiguity?</div>
+          <div class="chat-bubble user">During our checkout redesign, we had only 60% of the user research we wanted. I set up a rapid A/B test framework and established clear go/no-go metrics upfront...</div>
+          <div class="chat-bubble feedback">
+            <div class="feedback-header">✦ AI Feedback</div>
+            Strong opening — good use of STAR structure. Add a specific metric for the outcome. Delivery pace: slightly fast. Confidence: excellent.
+          </div>
+          <div class="typing-row"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label reveal">What makes it different</div>
+  <h2 class="section-title reveal">Not a quiz. A real<br><em>interview simulation.</em></h2>
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-title">Role-Calibrated Questions</div>
+      <p class="feature-desc">Every session is built around your specific role, seniority level, and industry. A VP of Finance interview sounds nothing like a junior engineer interview — ours doesn't either.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Real-Time Answer Coaching</div>
+      <p class="feature-desc">Instant feedback after every answer. Not just "that was good" — specific, actionable notes on structure, relevance, confidence signals, and what to add or cut.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◈</div>
+      <div class="feature-title">Behavioral & Technical Modes</div>
+      <p class="feature-desc">Toggle between behavioral (STAR method, culture fit, leadership) and technical (case studies, domain knowledge, problem-solving). One platform for every interview type.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">∞</div>
+      <div class="feature-title">Pressure Sessions</div>
+      <p class="feature-desc">Enable "hostile mode" — the AI pushes back, asks follow-up challenges, and simulates a tough panel. If you can handle this, the real thing will feel easy.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Full Session Reports</div>
+      <p class="feature-desc">After every session, receive a scored report across 8 performance dimensions. Track your improvement across sessions. Know exactly where you've grown.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◎</div>
+      <div class="feature-title">Company-Specific Prep</div>
+      <p class="feature-desc">Select a specific company and role. We tailor questions to that company's known interview style, values, and past candidate experiences. Show up prepared for their playbook.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section class="roles" id="roles">
+  <div class="section-label reveal">Industries</div>
+  <h2 class="section-title reveal">Trained for <em>every room</em><br>you'll walk into.</h2>
+  <div class="roles-grid">
+    <div class="roles-list reveal">
+      <div class="role-item active" onclick="selectRole(this,'Product Management','Product sense, metrics, roadmapping, stakeholder management, go-to-market')">
+        <span class="role-name">Product Management</span>
+        <span class="role-count">180+ questions</span>
+        <span class="role-arrow">→</span>
+      </div>
+      <div class="role-item" onclick="selectRole(this,'Software Engineering','System design, algorithms, code review, technical leadership, architecture')">
+        <span class="role-name">Software Engineering</span>
+        <span class="role-count">220+ questions</span>
+        <span class="role-arrow">→</span>
+      </div>
+      <div class="role-item" onclick="selectRole(this,'Strategy & Consulting','Case interviews, frameworks, market sizing, business analysis, problem structuring')">
+        <span class="role-name">Strategy & Consulting</span>
+        <span class="role-count">150+ questions</span>
+        <span class="role-arrow">→</span>
+      </div>
+      <div class="role-item" onclick="selectRole(this,'Investment Banking','Financial modelling, deal analysis, markets, valuation, M&A, competency questions')">
+        <span class="role-name">Finance & Banking</span>
+        <span class="role-count">130+ questions</span>
+        <span class="role-arrow">→</span>
+      </div>
+      <div class="role-item" onclick="selectRole(this,'Marketing & Growth','Campaign strategy, analytics, brand positioning, growth loops, channel ownership')">
+        <span class="role-name">Marketing & Growth</span>
+        <span class="role-count">140+ questions</span>
+        <span class="role-arrow">→</span>
+      </div>
+      <div class="role-item" onclick="selectRole(this,'Data & Analytics','SQL, statistical thinking, experiment design, dashboards, stakeholder communication')">
+        <span class="role-name">Data & Analytics</span>
+        <span class="role-count">160+ questions</span>
+        <span class="role-arrow">→</span>
+      </div>
+    </div>
+    <div class="role-preview reveal">
+      <div class="rp-header">
+        <div class="rp-title">Sample Questions</div>
+        <div class="rp-role" id="rp-role">Product Management</div>
+      </div>
+      <div class="rp-body" id="rp-questions">
+        <div class="question-chip">How would you prioritize features for a product with 3 competing stakeholder groups and limited engineering capacity?</div>
+        <div class="question-chip">Walk me through how you'd define success metrics for a brand new product with no historical data.</div>
+        <div class="question-chip">You're 2 weeks before launch and engineering tells you a core feature will be delayed. What do you do?</div>
+        <div class="question-chip loading">Tell me about a product decision you made that turned out to be wrong. What did you learn?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEEDBACK DETAIL -->
+<section class="feedback-section">
+  <div class="section-label reveal">The Feedback</div>
+  <h2 class="section-title reveal">Feedback that actually<br><em>changes you.</em></h2>
+  <div class="fb-grid">
+    <div class="fb-visual reveal">
+      <div class="fb-header">
+        <span class="fb-title">Session Performance Report</span>
+        <span class="session-id">Session #0042</span>
+      </div>
+      <div class="fb-body">
+        <div class="fb-metric"><span class="fb-metric-name">Answer Structure (STAR)</span><span class="fb-metric-score good">8.5 / 10</span></div>
+        <div class="fb-metric"><span class="fb-metric-name">Confidence & Delivery</span><span class="fb-metric-score excellent">9.2 / 10</span></div>
+        <div class="fb-metric"><span class="fb-metric-name">Relevance to Question</span><span class="fb-metric-score good">7.8 / 10</span></div>
+        <div class="fb-metric"><span class="fb-metric-name">Quantified Impact</span><span class="fb-metric-score needs-work">6.1 / 10</span></div>
+        <div class="fb-metric"><span class="fb-metric-name">Conciseness</span><span class="fb-metric-score good">8.0 / 10</span></div>
+        <div class="fb-comment">
+          <div class="fb-comment-label">AI Coach Note</div>
+          <div class="fb-comment-text">Your storytelling is genuinely strong — the panel format answer was excellent. Focus session 5 on adding specific numbers to every impact claim. You have the results; we just need to surface them.</div>
+        </div>
+      </div>
+    </div>
+    <div class="fb-benefits reveal">
+      <div class="fb-benefit">
+        <div class="fb-benefit-title">8 Performance Dimensions</div>
+        <p class="fb-benefit-desc">Scored across structure, delivery, relevance, confidence, quantification, conciseness, culture fit signals, and role-specific knowledge — giving you a complete picture after every session.</p>
+      </div>
+      <div class="fb-benefit">
+        <div class="fb-benefit-title">Progress Tracking</div>
+        <p class="fb-benefit-desc">Every session is stored. Watch your scores improve over time and identify exactly which areas have grown — and which still need work before your real interview date.</p>
+      </div>
+      <div class="fb-benefit">
+        <div class="fb-benefit-title">Model Answers</div>
+        <p class="fb-benefit-desc">For every question you struggled with, see what an ideal answer looks like — then practice that exact question again until your score reflects your actual capability.</p>
+      </div>
+      <div class="fb-benefit">
+        <div class="fb-benefit-title">Interview Debrief</div>
+        <p class="fb-benefit-desc">After each session, receive a plain-language coaching summary written by the AI — the same note a career coach would give you after watching your full session back.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section class="industries">
+  <div class="section-label reveal">Coverage</div>
+  <h2 class="section-title reveal"><em>Every industry.</em><br>Every level.</h2>
+  <div class="industry-grid reveal">
+    <div class="industry-card">
+      <div class="industry-icon">💻</div>
+      <div class="industry-name">Technology</div>
+      <div class="industry-sub">FAANG, Scale-ups, SaaS</div>
+      <div class="industry-q-count">380+</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon">🏦</div>
+      <div class="industry-name">Finance</div>
+      <div class="industry-sub">IB, PE, VC, Corporate</div>
+      <div class="industry-q-count">260+</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon">📊</div>
+      <div class="industry-name">Consulting</div>
+      <div class="industry-sub">MBB, Big 4, Boutique</div>
+      <div class="industry-q-count">220+</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon">🚀</div>
+      <div class="industry-name">Startups</div>
+      <div class="industry-sub">Seed, Series A–C</div>
+      <div class="industry-q-count">170+</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi">
+  <div class="section-label reveal">Outcomes</div>
+  <h2 class="section-title reveal">After the <em>practice.</em></h2>
+  <div class="testi-scroll reveal">
+    <div class="testi-card">
+      <div class="testi-tag">Consulting</div>
+      <div class="quote-mark">"</div>
+      <p class="testi-text">Did 12 sessions before my McKinsey final round. The AI grilled me harder than the actual panel. I went in completely calm.</p>
+      <div class="testi-author">
+        <div class="ta-avatar">OA</div>
+        <div><div class="ta-name">Onur A.</div><div class="ta-role">Engagement Manager, McKinsey</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-tag">Product</div>
+      <div class="quote-mark">"</div>
+      <p class="testi-text">I used to ramble. The feedback on "conciseness" after session 2 changed how I answer questions forever. Not just in interviews — in life.</p>
+      <div class="testi-author">
+        <div class="ta-avatar">ZD</div>
+        <div><div class="ta-name">Zeynep D.</div><div class="ta-role">Group PM, E-commerce Scale-up</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-tag">Engineering</div>
+      <div class="quote-mark">"</div>
+      <p class="testi-text">The hostile mode is brilliant. After being grilled by the AI for 40 minutes, a real technical interview feels almost relaxing.</p>
+      <div class="testi-author">
+        <div class="ta-avatar">LS</div>
+        <div><div class="ta-name">Luca S.</div><div class="ta-role">Staff Engineer, Fintech</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING TEASER -->
+<section class="pricing-teaser">
+  <div class="section-label reveal" style="justify-content:center">Sessions</div>
+  <h2 class="section-title reveal">Pick your <em>intensity.</em></h2>
+  <div class="pt-grid reveal">
+    <div class="pt-card">
+      <div class="pt-name">Starter</div>
+      <div class="pt-sessions">3 sessions</div>
+      <div class="pt-desc">Free · No card needed</div>
+    </div>
+    <div class="pt-card featured">
+      <div class="pt-name">Professional</div>
+      <div class="pt-sessions">50 sessions / mo</div>
+      <div class="pt-desc">Included in Pro Plan — $29/mo</div>
+    </div>
+    <div class="pt-card">
+      <div class="pt-name">Executive</div>
+      <div class="pt-sessions">Unlimited</div>
+      <div class="pt-desc">Executive Plan — $79/mo</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <h2 class="cta-title reveal">The room is ready.<br><em>Are you?</em></h2>
+  <p class="cta-sub reveal">Your first 3 interview sessions are completely free. No card, no commitment — just practice.</p>
+  <div class="cta-note reveal">✓ 3 Free sessions &nbsp;·&nbsp; ✓ Instant setup &nbsp;·&nbsp; ✓ Any role, any level</div>
+  <div class="reveal"><a href="#" class="btn-primary" style="display:inline-block">Begin Free Session</a></div>
+</section>
+
+<footer>
+  <div class="footer-copy">© 2025 Synaps Career</div>
+  <div class="footer-links">
+    <a href="home.html">Home</a>
+    <a href="cv-builder.html">CV Builder</a>
+    <a href="cv-doctor.html">CV Doctor</a>
+    <a href="index.html">Index</a>
+  </div>
+</footer>
+
+<script>
+const cursor=document.getElementById('cursor'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,button,.role-item').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.style.width='18px';cursor.style.height='18px';ring.style.width='56px';ring.style.height='56px'});el.addEventListener('mouseleave',()=>{cursor.style.width='10px';cursor.style.height='10px';ring.style.width='40px';ring.style.height='40px'})});
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60));
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+const roleQuestions={
+  'Product Management':['How would you prioritize features for a product with 3 competing stakeholder groups?','Walk me through how you'd define success metrics for a brand new product.','You're 2 weeks before launch and engineering tells you a core feature will be delayed. What do you do?','Tell me about a product decision that turned out to be wrong. What did you learn?'],
+  'Software Engineering':['Design a distributed rate limiter. Walk me through your approach.','How would you approach refactoring a 5-year-old monolith into microservices?','Tell me about a time you had to debug a critical production issue under pressure.','How do you decide between over-engineering and under-engineering a solution?'],
+  'Strategy & Consulting':['How would you estimate the market size for EV charging stations in Turkey?','A retail client's margins have declined 8% YoY. Structure your diagnostic approach.','How would you advise a traditional bank entering the crypto space?','Walk me through how you'd build a go-to-market strategy for a B2B SaaS product.'],
+  'Investment Banking':['Walk me through a DCF model. Where do most analysts go wrong?','Why might a company choose to issue debt over equity for an acquisition?','How would you value a pre-revenue biotech startup?','Tell me about a deal or transaction that interests you and why.'],
+  'Marketing & Growth':['How would you design a growth experiment for a new B2C product?','Your CAC has increased 40% in 3 months. How do you diagnose this?','Walk me through how you'd build a brand positioning framework for a challenger brand.','What's your framework for deciding between organic and paid acquisition channels?'],
+  'Data & Analytics':['How would you design an experiment to test a new recommendation algorithm?','Your CEO asks you to prove that a recent product change caused a revenue increase. How?','Walk me through how you'd build a churn prediction model from scratch.','What questions would you ask before trusting a dataset you've never seen?']
+};
+
+function selectRole(el, role, desc){
+  document.querySelectorAll('.role-item').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('rp-role').textContent=role;
+  const qs=roleQuestions[role]||[];
+  document.getElementById('rp-questions').innerHTML=qs.map((q,i)=>`<div class="question-chip${i===3?' loading':''}">${q}</div>`).join('');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synaps Career</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--purple:#7C3AED;--purple-light:#A78BFA;--black:#0A0A0A;--white:#FAFAFA}
+  body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .grain{position:fixed;inset:0;opacity:.035;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .orb{position:fixed;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,.18) 0%,transparent 70%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:pulse 4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}}
+  .container{text-align:center;position:relative;z-index:1}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:300;letter-spacing:-.02em;margin-bottom:4px}
+  .logo span{color:var(--purple-light);font-style:italic}
+  .tagline{font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:3rem}
+  .nav{display:flex;flex-direction:column;gap:.75rem;align-items:center}
+  .nav a{display:flex;align-items:center;gap:1rem;padding:.875rem 2rem;border:1px solid rgba(255,255,255,.08);color:var(--white);text-decoration:none;font-size:.875rem;letter-spacing:.05em;transition:all .3s ease;position:relative;overflow:hidden;min-width:300px}
+  .nav a::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--purple),var(--purple-light));opacity:0;transition:opacity .3s}
+  .nav a:hover::before{opacity:.12}
+  .nav a:hover{border-color:var(--purple-light);transform:translateX(4px)}
+  .nav a .num{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--purple-light);line-height:1}
+  .nav a .label{flex:1;text-align:left}
+  .nav a .arrow{opacity:.4;transition:opacity .3s}
+  .nav a:hover .arrow{opacity:1}
+  .main-link{margin-top:1rem}
+  .main-link a{background:var(--purple);border:none;padding:1rem 2.5rem;font-size:.875rem;letter-spacing:.08em;text-transform:uppercase;justify-content:center}
+  .main-link a::before{display:none}
+  .main-link a:hover{background:#6D28D9;transform:none}
+  .footer-note{margin-top:2.5rem;font-size:.7rem;color:rgba(255,255,255,.2);letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="orb"></div>
+<div class="container">
+  <div class="logo">Synaps <span>Career</span></div>
+  <div class="tagline">Your AI-Powered Career Intelligence Platform</div>
+  <div class="nav">
+    <div class="main-link"><a href="home.html">↗ Enter Site — Ana Sayfa</a></div>
+    <a href="cv-builder.html">
+      <span class="num">01</span>
+      <span class="label">CV Builder</span>
+      <span class="arrow">→</span>
+    </a>
+    <a href="cv-doctor.html">
+      <span class="num">02</span>
+      <span class="label">CV Doctor</span>
+      <span class="arrow">→</span>
+    </a>
+    <a href="interview-coach.html">
+      <span class="num">03</span>
+      <span class="label">AI Interview Coach</span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+  <div class="footer-note">© 2025 Synaps Career · GitHub Pages Demo</div>
+</div>
+</body>
+</html>
